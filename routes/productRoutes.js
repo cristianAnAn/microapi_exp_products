@@ -3,6 +3,7 @@ const router = express.Router();
 const productController = require('../controllers/productController');
 const { verifyToken, requireRole } = require('../middlewares/auth');
 const upload = require('../middlewares/upload');
+
 /**
  * @swagger
  * tags:
@@ -16,6 +17,8 @@ const upload = require('../middlewares/upload');
  *   get:
  *     summary: Obtiene todos los productos (paginado)
  *     tags: [Productos]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -30,10 +33,12 @@ const upload = require('../middlewares/upload');
  *     responses:
  *       200:
  *         description: Lista de productos
+ *       401:
+ *         description: Token no proporcionado o inválido
  *       500:
  *         description: Error al obtener productos
  */
-router.get('/', productController.getAll);
+router.get('/', verifyToken, productController.getAll);
 
 /**
  * @swagger
@@ -41,6 +46,8 @@ router.get('/', productController.getAll);
  *   get:
  *     summary: Obtiene un producto por su ID
  *     tags: [Productos]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -51,12 +58,16 @@ router.get('/', productController.getAll);
  *     responses:
  *       200:
  *         description: Producto encontrado
+ *       401:
+ *         description: Token no proporcionado o inválido
+ *       403:
+ *         description: Producto no pertenece al usuario
  *       404:
  *         description: Producto no encontrado
  *       500:
  *         description: Error al obtener producto
  */
-router.get('/:id', productController.getById);
+router.get('/:id', verifyToken, productController.getById);
 
 /**
  * @swagger
@@ -69,7 +80,7 @@ router.get('/:id', productController.getById);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             $ref: '#/components/schemas/Product'
  *     responses:
@@ -84,7 +95,7 @@ router.get('/:id', productController.getById);
  *       500:
  *         description: Error al crear producto
  */
-router.post('/', verifyToken, requireRole('ADMINISTRADOR'),upload.single('image'), productController.create);
+router.post('/', verifyToken, requireRole('ADMINISTRADOR'), upload.single('image'), productController.create);
 
 /**
  * @swagger
@@ -104,7 +115,7 @@ router.post('/', verifyToken, requireRole('ADMINISTRADOR'),upload.single('image'
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             $ref: '#/components/schemas/Product'
  *     responses:
@@ -115,13 +126,13 @@ router.post('/', verifyToken, requireRole('ADMINISTRADOR'),upload.single('image'
  *       401:
  *         description: Token no proporcionado o inválido
  *       403:
- *         description: No autorizado. Rol insuficiente.
+ *         description: No autorizado o producto no te pertenece
  *       404:
  *         description: Producto no encontrado
  *       500:
  *         description: Error al actualizar producto
  */
-router.put('/:id', verifyToken, requireRole('ADMINISTRADOR'),upload.single('image'), productController.update);
+router.put('/:id', verifyToken, requireRole('ADMINISTRADOR'), upload.single('image'), productController.update);
 
 /**
  * @swagger
@@ -144,7 +155,7 @@ router.put('/:id', verifyToken, requireRole('ADMINISTRADOR'),upload.single('imag
  *       401:
  *         description: Token no proporcionado o inválido
  *       403:
- *         description: No autorizado. Rol insuficiente.
+ *         description: No autorizado o producto no te pertenece
  *       404:
  *         description: Producto no encontrado
  *       500:

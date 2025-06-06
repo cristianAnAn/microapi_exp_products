@@ -2,94 +2,113 @@
 
 const Product = require('../models/product');
 const productSchema = require('../utils/productValidator');
+const response = require('../utils/responseDto');
 
 // GET: Obtener todos los productos (con paginación y header de total)
-exports.getAll = async (req, res) => {
+exports.getAll = async (req, res, next) => {
   try {
-    // Parámetros de paginación (opcional)
+    const userId = req.userId;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
-    // Consulta productos con paginación
     const { count, rows } = await Product.findAndCountAll({
+      where: { userId },
       offset,
       limit,
       order: [['ProductId', 'ASC']],
     });
 
-    // Header personalizado (total de registros)
     res.set('cantidad-total-registros', count.toString());
-    res.json(rows);
+    res.json(response(true, 'Productos obtenidos correctamente', rows));
   } catch (err) {
-    res.status(500).json({ message: 'Error al obtener productos', error: err.message });
+    next(err);
   }
 };
 
 // GET: Obtener producto por ID
-exports.getById = async (req, res) => {
+exports.getById = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const product = await Product.findByPk(id);
-    if (!product) return res.status(404).json({ message: 'Producto no encontrado' });
-    res.json(product);
+    const userId = req.userId;
+
+    const product = await Product.findOne({ where: { ProductId: id, userId } });
+    if (!product) {
+      throw { status: 404, message: 'Producto no encontrado o sin permisos' };
+    }
+
+    res.json(response(true, 'Producto obtenido correctamente', product));
   } catch (err) {
-    res.status(500).json({ message: 'Error al obtener el producto', error: err.message });
+    next(err);
   }
 };
 
 // POST: Crear producto
-exports.create = async (req, res) => {
-  // Validación
+exports.create = async (req, res, next) => {
   const { error } = productSchema.validate(req.body);
-  if (error) return res.status(400).json({ message: error.details[0].message });
+  if (error) {
+    return next({ status: 400, message: error.details[0].message });
+  }
 
   try {
     let data = req.body;
-    // Si se subió imagen, guardar ruta local y URL pública
+    data.userId = req.userId;
+
     if (req.file) {
       data.ImageLocalPath = `/ProductImages/${req.file.filename}`;
       data.ImageUrl = `${req.protocol}://${req.get('host')}/ProductImages/${req.file.filename}`;
     }
+
     const newProduct = await Product.create(data);
-    res.status(201).json(newProduct);
+    res.status(201).json(response(true, 'Producto creado exitosamente', newProduct));
   } catch (err) {
-    res.status(500).json({ message: 'Error al crear producto', error: err.message });
+    next(err);
   }
 };
 
 // PUT: Actualizar producto
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
   const { error } = productSchema.validate(req.body);
-  if (error) return res.status(400).json({ message: error.details[0].message });
+  if (error) {
+    return next({ status: 400, message: error.details[0].message });
+  }
 
   try {
     const id = req.params.id;
-    const product = await Product.findByPk(id);
-    if (!product) return res.status(404).json({ message: 'Producto no encontrado' });
+    const userId = req.userId;
+
+    const product = await Product.findOne({ where: { ProductId: id, userId } });
+    if (!product) {
+      throw { status: 403, message: 'No tienes permiso para modificar este producto' };
+    }
 
     let data = req.body;
     if (req.file) {
       data.ImageLocalPath = `/ProductImages/${req.file.filename}`;
       data.ImageUrl = `${req.protocol}://${req.get('host')}/ProductImages/${req.file.filename}`;
     }
+
     await product.update(data);
-    res.json(product);
+    res.json(response(true, 'Producto actualizado correctamente', product));
   } catch (err) {
-    res.status(500).json({ message: 'Error al actualizar producto', error: err.message });
+    next(err);
   }
 };
 
 // DELETE: Eliminar producto
-exports.remove = async (req, res) => {
+exports.remove = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const product = await Product.findByPk(id);
-    if (!product) return res.status(404).json({ message: 'Producto no encontrado' });
+    const userId = req.userId;
+
+    const product = await Product.findOne({ where: { ProductId: id, userId } });
+    if (!product) {
+      throw { status: 403, message: 'No tienes permiso para eliminar este producto' };
+    }
 
     await product.destroy();
-    res.json({ message: 'Producto eliminado' });
+    res.json(response(true, 'Producto eliminado correctamente'));
   } catch (err) {
-    res.status(500).json({ message: 'Error al eliminar producto', error: err.message });
+    next(err);
   }
 };

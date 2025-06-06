@@ -6,7 +6,7 @@ const options = {
     info: {
       title: 'MicroAPI Productos',
       version: '1.0.0',
-      description: 'API de productos protegida con JWT y documentación Swagger',
+      description: 'API de productos protegida con JWT y documentada con Swagger',
     },
     components: {
       securitySchemes: {
@@ -14,22 +14,24 @@ const options = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: "Agrega aquí tu token JWT obtenido desde el microservicio Auth. Ejemplo: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI..."
+          description: "Ingresa tu token JWT aquí. Ejemplo: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         }
       },
       schemas: {
         Product: {
           type: 'object',
           properties: {
-            ProductId: { type: 'integer', example: 1 },
-            Name: { type: 'string', example: 'Camiseta' },
-            Price: { type: 'number', example: 150.99 },
-            Description: { type: 'string', example: 'Camiseta de algodón' },
-            CategoryName: { type: 'string', example: 'Ropa' },
-            ImageUrl: { type: 'string', example: 'https://servidor.com/imagenes/1.jpg' },
-            ImageLocalPath: { type: 'string', example: '/ProductImages/img_1.jpg' }
+            productId: { type: 'integer', example: 1 },
+            name: { type: 'string', example: 'Camiseta' },
+            price: { type: 'number', example: 150.99 },
+            description: { type: 'string', example: 'Camiseta de algodón' },
+            stock: { type: 'integer', example: 20 },
+            category: { type: 'string', example: 'Ropa' },
+            imageUrl: { type: 'string', example: 'https://servidor.com/imagenes/1.jpg' },
+            imageLocalPath: { type: 'string', example: '/ProductImages/img_1.jpg' },
+            userId: { type: 'integer', example: 4 } // si usas esto internamente, es bueno documentarlo
           },
-          required: ['Name', 'Price']
+          required: ['name', 'price', 'stock']
         }
       }
     },
@@ -37,10 +39,13 @@ const options = {
       { BearerAuth: [] }
     ],
     servers: [
-      { url: 'http://localhost:4000' }
+      {
+        url: 'http://localhost:4000',
+        description: 'Servidor local de desarrollo'
+      }
     ]
   },
-  apis: ['./routes/*.js'], // Asegúrate que apunte a donde están tus rutas con JSDoc
+  apis: ['./routes/*.js'], // Correcto si tus rutas están aquí
 };
 
 module.exports = swaggerJSDoc(options);
