@@ -31,7 +31,7 @@ properties: {
   userId: { type: 'integer', example: 4 }
 }
 ,
-          required: ['name', 'price', 'stock']
+          required: ['name', 'price']
         }
       }
     },
