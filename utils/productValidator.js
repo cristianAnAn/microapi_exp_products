@@ -1,8 +1,7 @@
-// utils/productValidator.js
 const Joi = require('joi');
 
 const productSchema = Joi.object({
-  name: Joi.string()
+  Name: Joi.string()
     .min(2)
     .max(100)
     .required()
@@ -12,14 +11,14 @@ const productSchema = Joi.object({
       'string.max': 'El nombre no debe exceder los 100 caracteres',
     }),
 
-  description: Joi.string()
+  Description: Joi.string()
     .max(500)
     .allow(null, '')
     .messages({
       'string.max': 'La descripción no debe exceder los 500 caracteres',
     }),
 
-  price: Joi.number()
+  Price: Joi.number()
     .positive()
     .precision(2)
     .required()
@@ -29,24 +28,13 @@ const productSchema = Joi.object({
       'any.required': 'El precio es obligatorio',
     }),
 
-  stock: Joi.number()
-    .integer()
-    .min(0)
-    .required()
-    .messages({
-      'number.base': 'El stock debe ser un número entero',
-      'number.min': 'El stock no puede ser negativo',
-      'any.required': 'El stock es obligatorio',
-    }),
-
-  category: Joi.string()
+  CategoryName: Joi.string()
     .valid('Electrónica', 'Ropa', 'Libros', 'Otros')
     .optional()
     .messages({
       'any.only': 'La categoría debe ser válida',
     }),
 
-  // Campos opcionales relacionados con la imagen
   ImageLocalPath: Joi.string().optional(),
   ImageUrl: Joi.string().uri().optional(),
 });

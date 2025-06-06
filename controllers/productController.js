@@ -1,6 +1,9 @@
 const Product = require('../models/product');
 const productSchema = require('../utils/productValidator');
 const response = require('../utils/responseDto');
+const fs = require('fs');
+const path = require('path');
+const { Op } = require('sequelize');
 
 // GET: Obtener todos los productos con paginación
 exports.getAll = async (req, res, next) => {
@@ -52,7 +55,6 @@ exports.create = async (req, res, next) => {
     const userId = req.userId;
     const { Name } = req.body;
 
-    // Validar duplicado por nombre
     const exists = await Product.findOne({ where: { Name, userId } });
     if (exists) {
       throw { status: 400, message: 'Ya existe un producto con ese nombre' };
@@ -89,12 +91,11 @@ exports.update = async (req, res, next) => {
       throw { status: 403, message: 'No tienes permiso para modificar este producto' };
     }
 
-    // Validar que no exista otro producto con el mismo nombre para el usuario
     const duplicate = await Product.findOne({
       where: {
         Name,
         userId,
-        ProductId: { [require('sequelize').Op.ne]: id }
+        ProductId: { [Op.ne]: id }
       }
     });
     if (duplicate) {
@@ -102,7 +103,16 @@ exports.update = async (req, res, next) => {
     }
 
     let data = req.body;
+
     if (req.file) {
+      // Eliminar imagen anterior si existe
+      if (product.ImageLocalPath) {
+        const oldImagePath = path.join(__dirname, '..', 'public', product.ImageLocalPath);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+
       data.ImageLocalPath = `/ProductImages/${req.file.filename}`;
       data.ImageUrl = `${req.protocol}://${req.get('host')}/ProductImages/${req.file.filename}`;
     }
@@ -123,6 +133,14 @@ exports.remove = async (req, res, next) => {
     const product = await Product.findOne({ where: { ProductId: id, userId } });
     if (!product) {
       throw { status: 403, message: 'No tienes permiso para eliminar este producto' };
+    }
+
+    // Eliminar imagen asociada si existe
+    if (product.ImageLocalPath) {
+      const imagePath = path.join(__dirname, '..', 'public', product.ImageLocalPath);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
 
     await product.destroy();

@@ -20,17 +20,17 @@ const options = {
       schemas: {
         Product: {
           type: 'object',
-          properties: {
-            productId: { type: 'integer', example: 1 },
-            name: { type: 'string', example: 'Camiseta' },
-            price: { type: 'number', example: 150.99 },
-            description: { type: 'string', example: 'Camiseta de algodón' },
-            stock: { type: 'integer', example: 20 },
-            category: { type: 'string', example: 'Ropa' },
-            imageUrl: { type: 'string', example: 'https://servidor.com/imagenes/1.jpg' },
-            imageLocalPath: { type: 'string', example: '/ProductImages/img_1.jpg' },
-            userId: { type: 'integer', example: 4 } // si usas esto internamente, es bueno documentarlo
-          },
+properties: {
+  ProductId: { type: 'integer', example: 1 },
+  Name: { type: 'string', example: 'Camiseta' },
+  Price: { type: 'number', example: 150.99 },
+  Description: { type: 'string', example: 'Camiseta de algodón' },
+  CategoryName: { type: 'string', example: 'Ropa' },
+  ImageUrl: { type: 'string', example: '...' },
+  ImageLocalPath: { type: 'string', example: '...' },
+  userId: { type: 'integer', example: 4 }
+}
+,
           required: ['name', 'price', 'stock']
         }
       }
