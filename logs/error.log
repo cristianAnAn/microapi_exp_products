@@ -1,0 +1,5 @@
+[2025-06-06T20:14:56.680Z] ERROR: [POST] /api/products → 400 La categoría debe ser válida
+[2025-06-06T20:15:33.768Z] ERROR: [POST] /api/products → 400 La categoría debe ser válida
+[2025-06-06T20:17:43.400Z] ERROR: [POST] /api/products → 400 "image" is not allowed
+[2025-06-06T20:18:48.459Z] ERROR: [PUT] /api/products/2 → 400 "image" is not allowed
+[2025-06-06T20:18:53.067Z] ERROR: [PUT] /api/products/2 → 400 "image" is not allowed

@@ -22,13 +22,7 @@ function verifyToken(req, res, next) {
       return res.status(403).json({ message: 'Token inválido o expirado' });
     }
 
-    // Aseguramos que el token contenga userId
-    if (!decoded.userId) {
-      return res.status(400).json({ message: 'Token inválido: falta userId' });
-    }
-
-    // Seteamos el userId y roles al request para usarlo en controladores
-    req.userId = decoded.userId;
+    // Asignamos los roles si existen, pero ya no userId
     req.roles = decoded.roles || [];
 
     next();

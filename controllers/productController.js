@@ -8,13 +8,11 @@ const { Op } = require('sequelize');
 // GET: Obtener todos los productos con paginación
 exports.getAll = async (req, res, next) => {
   try {
-    const userId = req.userId;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
     const { count, rows } = await Product.findAndCountAll({
-      where: { userId },
       offset,
       limit,
       order: [['ProductId', 'ASC']],
@@ -31,11 +29,10 @@ exports.getAll = async (req, res, next) => {
 exports.getById = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const userId = req.userId;
+    const product = await Product.findOne({ where: { ProductId: id } });
 
-    const product = await Product.findOne({ where: { ProductId: id, userId } });
     if (!product) {
-      throw { status: 404, message: 'Producto no encontrado o sin permisos' };
+      throw { status: 404, message: 'Producto no encontrado' };
     }
 
     res.json(response(true, 'Producto obtenido correctamente', product));
@@ -52,15 +49,14 @@ exports.create = async (req, res, next) => {
   }
 
   try {
-    const userId = req.userId;
     const { Name } = req.body;
 
-    const exists = await Product.findOne({ where: { Name, userId } });
+    const exists = await Product.findOne({ where: { Name } });
     if (exists) {
       throw { status: 400, message: 'Ya existe un producto con ese nombre' };
     }
 
-    let data = { ...req.body, userId };
+    let data = { ...req.body };
 
     if (req.file) {
       data.ImageLocalPath = `/ProductImages/${req.file.filename}`;
@@ -83,23 +79,21 @@ exports.update = async (req, res, next) => {
 
   try {
     const id = req.params.id;
-    const userId = req.userId;
     const { Name } = req.body;
 
-    const product = await Product.findOne({ where: { ProductId: id, userId } });
+    const product = await Product.findOne({ where: { ProductId: id } });
     if (!product) {
-      throw { status: 403, message: 'No tienes permiso para modificar este producto' };
+      throw { status: 404, message: 'Producto no encontrado' };
     }
 
     const duplicate = await Product.findOne({
       where: {
         Name,
-        userId,
         ProductId: { [Op.ne]: id }
       }
     });
     if (duplicate) {
-      throw { status: 400, message: 'Ya tienes otro producto con ese nombre' };
+      throw { status: 400, message: 'Ya existe otro producto con ese nombre' };
     }
 
     let data = req.body;
@@ -128,11 +122,10 @@ exports.update = async (req, res, next) => {
 exports.remove = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const userId = req.userId;
+    const product = await Product.findOne({ where: { ProductId: id } });
 
-    const product = await Product.findOne({ where: { ProductId: id, userId } });
     if (!product) {
-      throw { status: 403, message: 'No tienes permiso para eliminar este producto' };
+      throw { status: 404, message: 'Producto no encontrado' };
     }
 
     // Eliminar imagen asociada si existe

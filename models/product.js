@@ -12,7 +12,6 @@ const Product = sequelize.define('Product', {
     type: DataTypes.STRING,
     allowNull: false,
     field: 'Name'
-    // No se usa unique aquí porque será compuesto
   },
   Price: {
     type: DataTypes.FLOAT,
@@ -38,21 +37,10 @@ const Product = sequelize.define('Product', {
     type: DataTypes.STRING,
     allowNull: true,
     field: 'ImageLocalPath'
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    field: 'userId'
   }
 }, {
   tableName: 'Productos',
-  timestamps: false,
-  indexes: [
-    {
-      unique: true,
-      fields: ['userId', 'Name'] // 🔐 Índice compuesto opcional
-    }
-  ]
+  timestamps: false
 });
 
 module.exports = Product;
