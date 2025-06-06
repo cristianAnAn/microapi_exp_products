@@ -1,4 +1,5 @@
 'use strict';
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Productos', {
@@ -8,9 +9,17 @@ module.exports = {
       Description: { type: Sequelize.STRING },
       CategoryName: { type: Sequelize.STRING },
       ImageUrl: { type: Sequelize.STRING },
-      ImageLocalPath: { type: Sequelize.STRING }
+      ImageLocalPath: { type: Sequelize.STRING },
+      userId: { type: Sequelize.INTEGER, allowNull: false } // ← Agrega esta línea
+    });
+
+    // Después de crear la tabla, ahora sí puedes agregar el índice compuesto
+    await queryInterface.addIndex('Productos', ['userId', 'Name'], {
+      unique: true,
+      name: 'user_product_unique'
     });
   },
+
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('Productos');
   }

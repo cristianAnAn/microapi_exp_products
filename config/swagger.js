@@ -40,7 +40,7 @@ properties: {
     ],
     servers: [
       {
-        url: 'http://localhost:4000',
+        url: 'http://localhost:3200',
         description: 'Servidor local de desarrollo'
       }
     ]
