@@ -82,7 +82,23 @@ router.get('/:id', verifyToken, productController.getById);
  *       content:
  *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/Product'
+ *             type: object
+ *             properties:
+ *               Name:
+ *                 type: string
+ *                 example: "Zapatos"
+ *               Price:
+ *                 type: number
+ *                 example: 299.99
+ *               Description:
+ *                 type: string
+ *                 example: "Zapatos de cuero legítimo"
+ *               CategoryName:
+ *                 type: string
+ *                 example: "Calzado"
+ *               image:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
  *         description: Producto creado exitosamente
@@ -95,7 +111,13 @@ router.get('/:id', verifyToken, productController.getById);
  *       500:
  *         description: Error al crear producto
  */
-router.post('/', verifyToken, requireRole('ADMINISTRADOR'), upload.single('image'), productController.create);
+router.post(
+  '/',
+  verifyToken,
+  requireRole('ADMINISTRADOR'),
+  upload.single('image'),
+  productController.create
+);
 
 /**
  * @swagger
@@ -117,7 +139,23 @@ router.post('/', verifyToken, requireRole('ADMINISTRADOR'), upload.single('image
  *       content:
  *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/Product'
+ *             type: object
+ *             properties:
+ *               Name:
+ *                 type: string
+ *                 example: "Zapatos deportivos"
+ *               Price:
+ *                 type: number
+ *                 example: 199.99
+ *               Description:
+ *                 type: string
+ *                 example: "Nueva descripción"
+ *               CategoryName:
+ *                 type: string
+ *                 example: "Deportes"
+ *               image:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
  *         description: Producto actualizado exitosamente
@@ -132,7 +170,13 @@ router.post('/', verifyToken, requireRole('ADMINISTRADOR'), upload.single('image
  *       500:
  *         description: Error al actualizar producto
  */
-router.put('/:id', verifyToken, requireRole('ADMINISTRADOR'), upload.single('image'), productController.update);
+router.put(
+  '/:id',
+  verifyToken,
+  requireRole('ADMINISTRADOR'),
+  upload.single('image'),
+  productController.update
+);
 
 /**
  * @swagger
@@ -161,6 +205,11 @@ router.put('/:id', verifyToken, requireRole('ADMINISTRADOR'), upload.single('ima
  *       500:
  *         description: Error al eliminar producto
  */
-router.delete('/:id', verifyToken, requireRole('ADMINISTRADOR'), productController.remove);
+router.delete(
+  '/:id',
+  verifyToken,
+  requireRole('ADMINISTRADOR'),
+  productController.remove
+);
 
 module.exports = router;

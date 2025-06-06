@@ -1,10 +1,8 @@
-// controllers/productController.js
-
 const Product = require('../models/product');
 const productSchema = require('../utils/productValidator');
 const response = require('../utils/responseDto');
 
-// GET: Obtener todos los productos (con paginación y header de total)
+// GET: Obtener todos los productos con paginación
 exports.getAll = async (req, res, next) => {
   try {
     const userId = req.userId;
@@ -51,8 +49,16 @@ exports.create = async (req, res, next) => {
   }
 
   try {
-    let data = req.body;
-    data.userId = req.userId;
+    const userId = req.userId;
+    const { Name } = req.body;
+
+    // Validar duplicado por nombre
+    const exists = await Product.findOne({ where: { Name, userId } });
+    if (exists) {
+      throw { status: 400, message: 'Ya existe un producto con ese nombre' };
+    }
+
+    let data = { ...req.body, userId };
 
     if (req.file) {
       data.ImageLocalPath = `/ProductImages/${req.file.filename}`;
@@ -76,10 +82,23 @@ exports.update = async (req, res, next) => {
   try {
     const id = req.params.id;
     const userId = req.userId;
+    const { Name } = req.body;
 
     const product = await Product.findOne({ where: { ProductId: id, userId } });
     if (!product) {
       throw { status: 403, message: 'No tienes permiso para modificar este producto' };
+    }
+
+    // Validar que no exista otro producto con el mismo nombre para el usuario
+    const duplicate = await Product.findOne({
+      where: {
+        Name,
+        userId,
+        ProductId: { [require('sequelize').Op.ne]: id }
+      }
+    });
+    if (duplicate) {
+      throw { status: 400, message: 'Ya tienes otro producto con ese nombre' };
     }
 
     let data = req.body;
