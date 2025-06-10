@@ -1,13 +1,12 @@
+// middlewares/upload.js
 const multer = require('multer');
 const path = require('path');
 
-// Directorio donde guardarás las imágenes
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/ProductImages');
+    cb(null, path.join(__dirname, '..', 'ProductImages')); // ahora apunta a la raíz
   },
   filename: function (req, file, cb) {
-    // Guarda la imagen con un nombre único
     const ext = path.extname(file.originalname);
     cb(null, 'img_' + Date.now() + ext);
   }
@@ -15,9 +14,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Máx 5MB (ajusta según necesidad)
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    // Solo acepta imágenes (jpeg, png, jpg)
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
     } else {

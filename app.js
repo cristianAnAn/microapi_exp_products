@@ -23,6 +23,8 @@ app.use(morgan('combined', {
 // Static: imágenes
 app.use('/ProductImages', express.static(path.join(__dirname, 'ProductImages')));
 
+
+
 // Middlewares
 app.use(cors());
 app.use(express.json());

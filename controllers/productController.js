@@ -101,7 +101,7 @@ exports.update = async (req, res, next) => {
     if (req.file) {
       // Eliminar imagen anterior si existe
       if (product.ImageLocalPath) {
-        const oldImagePath = path.join(__dirname, '..', 'public', product.ImageLocalPath);
+        const oldImagePath = path.join(__dirname, '..', 'ProductImages', path.basename(product.ImageLocalPath));
         if (fs.existsSync(oldImagePath)) {
           fs.unlinkSync(oldImagePath);
         }
@@ -130,7 +130,7 @@ exports.remove = async (req, res, next) => {
 
     // Eliminar imagen asociada si existe
     if (product.ImageLocalPath) {
-      const imagePath = path.join(__dirname, '..', 'public', product.ImageLocalPath);
+      const imagePath = path.join(__dirname, '..', 'ProductImages', path.basename(product.ImageLocalPath));
       if (fs.existsSync(imagePath)) {
         fs.unlinkSync(imagePath);
       }

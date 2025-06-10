@@ -28,12 +28,14 @@ const productSchema = Joi.object({
       'any.required': 'El precio es obligatorio',
     }),
 
-  CategoryName: Joi.string()
-    .valid('Electrónica', 'Ropa', 'Libros', 'Otros')
-    .optional()
-    .messages({
-      'any.only': 'La categoría debe ser válida',
-    }),
+CategoryName: Joi.string()
+  .max(100) // o el límite que desees
+  .allow(null, '')
+  .optional()
+  .messages({
+    'string.max': 'La categoría no debe exceder los 100 caracteres',
+  }),
+
 
   ImageLocalPath: Joi.string().optional(),
   ImageUrl: Joi.string().uri().optional(),
